@@ -44,6 +44,27 @@ namespace dsn
 {
     namespace tools 
     {
+        namespace
+        {
+            class scoped_log_monitor_run
+            {
+            public:
+                explicit scoped_log_monitor_run(bool& running)
+                    : _running(running)
+                {
+                    _running = true;
+                }
+
+                ~scoped_log_monitor_run()
+                {
+                    _running = false;
+                }
+
+            private:
+                bool& _running;
+            };
+        }
+
         log_monitor_slave::log_monitor_slave(const char* dir, logging_provider* inner)
             : logging_provider(dir, inner), _inner(inner)
         {
@@ -70,9 +91,11 @@ namespace dsn
         void log_monitor_slave::dsn_logv(const char *file, const char *function, const int line, dsn_log_level_t log_level, const char* title, const char* fmt, va_list args)
         {
             if (s_log_monitor_run)
+            {
                 return;
+            }
 
-            s_log_monitor_run = true;
+            scoped_log_monitor_run guard(s_log_monitor_run);
 
             // redirect
             if (log_level >= LOG_LEVEL_WARNING 
@@ -93,9 +116,10 @@ namespace dsn
                 int c = std::vsnprintf(buffer, sizeof(buffer) / sizeof(char),
                     fmt, args2
                 );
+                va_end(args2);
 
                 if (c < 0) c = 0;
-                else if (c >= 1023) c = 1023;
+                else if (c >= static_cast<int>(sizeof(buffer))) c = static_cast<int>(sizeof(buffer) - 1);
                 buffer[c] = '\0';
 
                 entry.log = buffer;
@@ -104,8 +128,6 @@ namespace dsn
             }
 
             _inner->dsn_logv(file, function, line, log_level, title, fmt, args);
-
-            s_log_monitor_run = false;
         }
 
     }
