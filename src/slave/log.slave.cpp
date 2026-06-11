@@ -40,9 +40,6 @@
 # include <dsn/service_api_cpp.h>
 # include "../common/log_monitor.types.h"
 
-# include <cstdarg>
-# include <cstdio>
-
 namespace dsn 
 {
     namespace tools 
