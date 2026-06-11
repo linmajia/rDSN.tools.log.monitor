@@ -95,7 +95,6 @@ namespace dsn
         {
             if (s_log_monitor_run)
             {
-                _inner->dsn_logv(file, function, line, log_level, title, fmt, args);
                 return;
             }
 
