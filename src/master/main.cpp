@@ -35,6 +35,8 @@
  */
 
 
+# include <cstdio>
+# include <string>
 # include <dsn/utility/module_init.cpp.h>
 # include "../common/log_monitor.types.h"
 
@@ -42,6 +44,24 @@ namespace dsn
 {
     namespace tools
     {
+        namespace
+        {
+            // Neutralize control characters in untrusted, remote-supplied
+            // strings before printing, to prevent terminal escape sequence
+            // and forged log line injection (CWE-117).
+            std::string sanitize_for_output(const std::string& s)
+            {
+                std::string out;
+                out.reserve(s.size());
+                for (char ch : s)
+                {
+                    const unsigned char uc = static_cast<unsigned char>(ch);
+                    out.push_back((uc < 0x20 || uc == 0x7f) ? '?' : ch);
+                }
+                return out;
+            }
+        }
+
         class log_monitor_master : 
             public service_app,
             public serverlet<log_monitor_master>
@@ -76,21 +96,26 @@ namespace dsn
                 log_monitor_entry log;
                 ::dsn::unmarshall(req, log);
 
+                const std::string safe_log = sanitize_for_output(log.log);
+                const std::string safe_file = sanitize_for_output(log.file);
+                const std::string safe_func = sanitize_for_output(log.func);
+
                 printf("[%c @ %s] %s (%s:%s:%d)\n",
                     log.level == LOG_LEVEL_WARNING ? 'w':'e',
                     from.to_string(),
-                    log.log.c_str(),
-                    log.file.c_str(),
-                    log.func.c_str(),
+                    safe_log.c_str(),
+                    safe_file.c_str(),
+                    safe_func.c_str(),
                     log.line
                     );
+                fflush(stdout);
 
                 dinfo("[%c @ %s] %s (%s:%s:%d)",
                     log.level == LOG_LEVEL_WARNING ? 'w' : 'e',
                     from.to_string(),
-                    log.log.c_str(),
-                    log.file.c_str(),
-                    log.func.c_str(),
+                    safe_log.c_str(),
+                    safe_file.c_str(),
+                    safe_func.c_str(),
                     log.line
                 );
             }
@@ -98,6 +123,6 @@ namespace dsn
     }
 }
 
-MODULE_INIT_BEGIN(tools_explorer)
+MODULE_INIT_BEGIN(tools_log_monitor_master)
     ::dsn::register_app< dsn::tools::log_monitor_master>("log.monitor.master");
 MODULE_INIT_END
