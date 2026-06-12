@@ -26,8 +26,9 @@
 
 /*
  * Description:
- *     the tracer toollets traces all the asynchonous execution flow
- *     in the system through the join-point mechanism
+ *     this is a log aspect provider which redirects any
+ *     logs with WARNING and above logging levels to
+ *     the log monitor master as specified in configuration file
  *
  * Revision history:
  *     May, 2016, @imzhenyu (Zhenyu Guo), first version
@@ -35,10 +36,10 @@
  */
 
 
-# include "log.slave.h"
 # include <dsn/utility/ports.h>
 # include <dsn/service_api_cpp.h>
 # include "../common/log_monitor.types.h"
+# include "log.slave.h"
 
 namespace dsn 
 {
