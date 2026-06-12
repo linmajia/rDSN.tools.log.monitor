@@ -93,17 +93,18 @@ namespace dsn
         __thread bool s_log_monitor_run = false;
         void log_monitor_slave::dsn_logv(const char *file, const char *function, const int line, dsn_log_level_t log_level, const char* title, const char* fmt, va_list args)
         {
-            // Redirect WARNING+ logs to the master, but only when we are not
-            // already inside a redirect on this thread (otherwise logs emitted
-            // by the RPC layer would recurse infinitely). The guard scopes the
-            // redirect only, never the local logging below.
-            if (!s_log_monitor_run
-                && log_level >= LOG_LEVEL_WARNING
+            if (s_log_monitor_run)
+            {
+                return;
+            }
+
+            scoped_log_monitor_run guard(s_log_monitor_run);
+
+            // redirect
+            if (log_level >= LOG_LEVEL_WARNING 
                 && ::dsn::task::get_current_rpc()
                 )
             {
-                scoped_log_monitor_run guard(s_log_monitor_run);
-
                 log_monitor_entry entry;
                 entry.file = file;
                 entry.line = line;
@@ -129,8 +130,6 @@ namespace dsn
                 rpc::call_one_way_typed(_master, RPC_LOG_MONITOR_REPORT, entry);
             }
 
-            // Always forward to the inner provider so local logging is never
-            // lost, including for logs emitted during a re-entrant redirect.
             _inner->dsn_logv(file, function, line, log_level, title, fmt, args);
         }
 
