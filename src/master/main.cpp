@@ -84,6 +84,7 @@ namespace dsn
                     log.func.c_str(),
                     log.line
                     );
+                fflush(stdout);
 
                 dinfo("[%c @ %s] %s (%s:%s:%d)",
                     log.level == LOG_LEVEL_WARNING ? 'w' : 'e',
@@ -98,6 +99,6 @@ namespace dsn
     }
 }
 
-MODULE_INIT_BEGIN(tools_explorer)
+MODULE_INIT_BEGIN(tools_log_monitor_master)
     ::dsn::register_app< dsn::tools::log_monitor_master>("log.monitor.master");
 MODULE_INIT_END
