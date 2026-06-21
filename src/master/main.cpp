@@ -100,5 +100,6 @@ namespace dsn
 }
 
 MODULE_INIT_BEGIN(tools_log_monitor_master)
-    ::dsn::register_app< dsn::tools::log_monitor_master>("log.monitor.master");
+    dassert(::dsn::register_app< dsn::tools::log_monitor_master>("log.monitor.master"),
+            "register log.monitor.master app failed");
 MODULE_INIT_END
