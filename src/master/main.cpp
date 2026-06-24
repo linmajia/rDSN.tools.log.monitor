@@ -2,8 +2,8 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Microsoft Corporation
- * 
- * -=- Robust Distributed System Nucleus (rDSN) -=- 
+ *
+ * -=- Robust Distributed System Nucleus (rDSN) -=-
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ namespace dsn
 {
     namespace tools
     {
-        class log_monitor_master : 
+        class log_monitor_master :
             public service_app,
             public serverlet<log_monitor_master>
         {
@@ -65,7 +65,7 @@ namespace dsn
             }
 
             ::dsn::error_code stop(bool cleanup = false) override
-            {                
+            {
                 unregister_rpc_handler(RPC_LOG_MONITOR_REPORT);
                 return ERR_OK;
             }
