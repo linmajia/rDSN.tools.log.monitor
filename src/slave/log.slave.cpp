@@ -2,8 +2,8 @@
  * The MIT License (MIT)
  *
  * Copyright (c) 2015 Microsoft Corporation
- * 
- * -=- Robust Distributed System Nucleus (rDSN) -=- 
+ *
+ * -=- Robust Distributed System Nucleus (rDSN) -=-
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@
 # include "../common/log_monitor.types.h"
 # include "log.slave.h"
 
-namespace dsn 
+namespace dsn
 {
-    namespace tools 
+    namespace tools
     {
         namespace
         {
@@ -77,9 +77,9 @@ namespace dsn
                 "",
                 "address of log monitor master, can be host:port, ip:port or service url"
             );
-            
+
             _master = url_host_address(master.c_str());
-        
+
             dassert(!_master.is_invalid(),
                 "invalid log monitor master address '%s'",
                 master.c_str()
@@ -99,7 +99,7 @@ namespace dsn
             scoped_log_monitor_run guard(s_log_monitor_run);
 
             // redirect
-            if (log_level >= LOG_LEVEL_WARNING 
+            if (log_level >= LOG_LEVEL_WARNING
                 && ::dsn::task::get_current_rpc()
                 )
             {
@@ -108,12 +108,12 @@ namespace dsn
                 entry.line = line;
                 entry.func = function;
                 entry.level = log_level;
-                
+
                 va_list args2;
                 va_copy(args2, args);
 
-                char buffer[1024]; 
-                
+                char buffer[1024];
+
                 int c = std::vsnprintf(buffer, sizeof(buffer) / sizeof(char),
                     fmt, args2
                 );

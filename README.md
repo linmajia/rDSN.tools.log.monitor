@@ -7,7 +7,7 @@ Something bad happens in the cluster, and we don't know why as the critical logs
 
 ### Solution
 
-Through the tool API in rDSN, we are able to redirect the critical logs to a centralized log master. 
+Through the tool API in rDSN, we are able to redirect the critical logs to a centralized log master.
 
 ### Build
 
@@ -44,12 +44,12 @@ For rDSN applications to be monitored (i.e., log monitor slaves), adding the fol
 dsn.tools.log.monitor.slave
 
 [core]
-logging_aspects = log.monitor.slave 
+logging_aspects = log.monitor.slave
 
 [tools.log.monitor]
 master = log-master-hostname:54333
 ```
 
-Then you should be able to see from the screen of the log master all the critical logs (log-level >= WARNING) from all slaves. 
+Then you should be able to see from the screen of the log master all the critical logs (log-level >= WARNING) from all slaves.
 
 
