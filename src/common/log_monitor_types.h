@@ -8,6 +8,8 @@
 #define log_monitor_TYPES_H
 
 #include <iosfwd>
+#include <cstdint>
+#include <string>
 
 #include <thrift/Thrift.h>
 #include <thrift/TApplicationException.h>
