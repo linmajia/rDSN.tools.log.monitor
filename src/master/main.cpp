@@ -37,6 +37,7 @@
 
 # include <dsn/utility/module_init.cpp.h>
 # include "../common/log_monitor.types.h"
+# include <cstdio>
 
 namespace dsn
 {
