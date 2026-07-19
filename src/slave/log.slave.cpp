@@ -80,12 +80,22 @@ namespace dsn
 
             _master = url_host_address(master.c_str());
 
-            dassert(!_master.is_invalid(),
-                "invalid log monitor master address '%s'",
-                master.c_str()
-            );
-
-            dinfo("setup log monitor master to '%s'", master.c_str());
+            if (_master.is_invalid())
+            {
+                // The master address comes from config ([tools.log.monitor] master,
+                // default empty), so an empty or malformed value is a recoverable
+                // misconfiguration -- not a programming error worth coredumping the whole
+                // host at startup. Log it and leave _master invalid; dsn_logv() below
+                // skips the report RPC when the master is invalid, so logging degrades to
+                // the inner provider only (log monitoring disabled) instead of aborting.
+                derror("invalid log monitor master address '%s'; log monitor reporting disabled",
+                    master.c_str()
+                );
+            }
+            else
+            {
+                dinfo("setup log monitor master to '%s'", master.c_str());
+            }
         }
 
         __thread bool s_log_monitor_run = false;
@@ -125,7 +135,10 @@ namespace dsn
 
                 entry.log = buffer;
 
-                rpc::call_one_way_typed(_master, RPC_LOG_MONITOR_REPORT, entry);
+                if (!_master.is_invalid())
+                {
+                    rpc::call_one_way_typed(_master, RPC_LOG_MONITOR_REPORT, entry);
+                }
             }
 
             _inner->dsn_logv(file, function, line, log_level, title, fmt, args);
